@@ -1,0 +1,65 @@
+# Ignore object files and compiled binaries
+# Ignore generated binaries
+*.exe
+*.out
+*.o
+*.obj
+*.a
+*.so
+*.dll
+*.dylib
+main
+
+# Ignore CUDA generated files
+*.cuda
+*.ptx
+*.cubin
+*.fatbin
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore backup files
+*~
+*.swp
+*.swo
+
+# Ignore logs and temporary files
+*.log
+*.tmp
+
+# Ignore losses and output data files
+losses.txt
+test_loss.txt
+
+# Ignore plot images
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.pdf
+
+# Ignore Python bytecode and cache directories
+__pycache__/
+*.pyc
+
+# Ignore backup files created by editors
+*~
+*.swp
+*.swo
+
+# Ignore build directories (if any)
+/build/
+build/
+dist/
+/.bin/
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore virtual environment directories (including .venv)
+venv/
+env/
+.venv/
