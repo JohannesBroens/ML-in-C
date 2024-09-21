@@ -20,8 +20,6 @@ I wish to improve my  "ML in C" abilities. Hence making a repo without any other
 │   │   └── ... (Example C programs)
 │   └── python/
 │       └── ... (Example Python scripts)
-├── data/
-│   └── ... (Datasets or data processing scripts)
 ├── src/
 │   ├── c/
 │   │   ├── CMakeLists.txt
@@ -35,14 +33,16 @@ I wish to improve my  "ML in C" abilities. Hence making a repo without any other
 │   │   │   └── ... (Other models)
 │   │   └── utils/
 │   │       └── ... (Utility functions)
-│   └── python/
-│       ├── setup.py
-│       ├── models/
-│       │   ├── mlp.py
-│       │   ├── cnn.py
-│       │   └── ... (Other models)
-│       └── utils/
-│           └── ... (Utility modules)
+│   ├── python/
+│   │   ├── setup.py
+│   │   ├── models/
+│   │   │   ├── mlp.py
+│   │   │   ├── cnn.py
+│   │   │   └── ... (Other models)
+│   │   └── utils/
+│   │       └── ... (Utility modules)
+|   └── data/
+|       └── ... (Datasets or data processing scripts)
 ├── tests/
 │   ├── c/
 │   │   └── ... (Unit tests for C code)
