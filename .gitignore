@@ -67,3 +67,5 @@ env/
 .bin/
 /.bin/
 .bin/
+/.*/
+.vscode/
