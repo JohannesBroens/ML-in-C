@@ -8,11 +8,6 @@
 #include <curand.h>
 #include <curand_kernel.h>
 
-// Common function to initialize random number generator
-static void seed_random() {
-    srand((unsigned int)time(NULL));
-}
-
 // ========================================================
 // CUDA Implementations
 // ========================================================
@@ -69,88 +64,96 @@ void mlp_free(MLP *mlp) {
     cudaFree(mlp->output_biases);
 }
 
-// Kernel for training
+// Kernel for training with Mini-Batch Gradient Descent
 __global__ void train_kernel(MLP mlp,
                              float *inputs, int *targets, int num_samples,
                              float learning_rate, int input_size, int hidden_size, int output_size) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    // Calculate the sample index within the batch
+    int sample_idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-    if (idx >= num_samples)
+    if (sample_idx >= num_samples)
         return;
 
-    // Forward pass
-    extern __shared__ float shared[];
-    float *hidden = shared;  // Shared memory for hidden layer activations
-    float *output = &shared[hidden_size];  // Output layer
+    // Thread-private variables stored in registers/local memory
+    // Using fixed-size arrays might not be ideal for large networks; adjust sizes accordingly
+    const int MAX_HIDDEN_SIZE = 1024;
+    const int MAX_OUTPUT_SIZE = 10;
 
-    // Compute hidden layer activations
+    float hidden_t[MAX_HIDDEN_SIZE];
+    float output_t[MAX_OUTPUT_SIZE];
+    float d_output_t[MAX_OUTPUT_SIZE];
+    float d_hidden_t[MAX_HIDDEN_SIZE];
+
+    // Load input and target
+    float *input_sample = &inputs[sample_idx * input_size];
+    int target_label = targets[sample_idx];
+
+    // Forward pass
     for (int i = 0; i < hidden_size; ++i) {
         float sum = mlp.hidden_biases[i];
         for (int j = 0; j < input_size; ++j) {
-            sum += inputs[idx * input_size + j] * mlp.input_weights[j * hidden_size + i];
+            sum += input_sample[j] * mlp.input_weights[j * hidden_size + i];
         }
         // Activation function (ReLU)
-        hidden[i] = fmaxf(0.0f, sum);
+        hidden_t[i] = fmaxf(0.0f, sum);
     }
 
-    // Compute output layer activations
+    // Output layer
     for (int i = 0; i < output_size; ++i) {
         float sum = mlp.output_biases[i];
         for (int j = 0; j < hidden_size; ++j) {
-            sum += hidden[j] * mlp.output_weights[j * output_size + i];
+            sum += hidden_t[j] * mlp.output_weights[j * output_size + i];
         }
-        // Activation function (Softmax or Sigmoid)
-        // For simplicity, using Sigmoid for binary classification
-        output[i] = 1.0f / (1.0f + expf(-sum));
+        // Activation function (Sigmoid)
+        output_t[i] = 1.0f / (1.0f + expf(-sum));
     }
 
-    // Compute error
-    float *errors = &shared[hidden_size + output_size];  // For output errors
+    // Compute error and gradients
     for (int i = 0; i < output_size; ++i) {
-        float target = (targets[idx] == i) ? 1.0f : 0.0f;  // One-hot encoding
-        errors[i] = target - output[i];
-    }
-
-    // Backward pass (simple gradient descent)
-    // Output layer gradients
-    float *d_output = &shared[hidden_size + 2 * output_size];
-    for (int i = 0; i < output_size; ++i) {
-        d_output[i] = errors[i] * output[i] * (1.0f - output[i]);  // Derivative of Sigmoid
+        float target = (target_label == i) ? 1.0f : 0.0f;  // One-hot encoding
+        float error = target - output_t[i];
+        d_output_t[i] = error * output_t[i] * (1.0f - output_t[i]);  // Derivative of Sigmoid
     }
 
     // Hidden layer gradients
-    float *d_hidden = &shared[hidden_size + 3 * output_size];
     for (int i = 0; i < hidden_size; ++i) {
         float sum = 0.0f;
         for (int j = 0; j < output_size; ++j) {
-            sum += d_output[j] * mlp.output_weights[i * output_size + j];
+            sum += d_output_t[j] * mlp.output_weights[i * output_size + j];
         }
-        d_hidden[i] = sum * ((hidden[i] > 0) ? 1.0f : 0.0f);  // Derivative of ReLU
+        d_hidden_t[i] = sum * ((hidden_t[i] > 0.0f) ? 1.0f : 0.0f);  // Derivative of ReLU
     }
 
-    // Update output weights and biases
+    // Update weights and biases using atomic operations
+    // Hidden to Output weights and biases
     for (int i = 0; i < hidden_size; ++i) {
         for (int j = 0; j < output_size; ++j) {
-            atomicAdd(&mlp.output_weights[i * output_size + j], learning_rate * d_output[j] * hidden[i]);
+            float gradient = d_output_t[j] * hidden_t[i];
+            atomicAdd(&mlp.output_weights[i * output_size + j], learning_rate * gradient);
         }
-    }
-    for (int i = 0; i < output_size; ++i) {
-        atomicAdd(&mlp.output_biases[i], learning_rate * d_output[i]);
     }
 
-    // Update input weights and biases
+    for (int i = 0; i < output_size; ++i) {
+        float gradient = d_output_t[i];
+        atomicAdd(&mlp.output_biases[i], learning_rate * gradient);
+    }
+
+    // Input to Hidden weights and biases
     for (int i = 0; i < input_size; ++i) {
         for (int j = 0; j < hidden_size; ++j) {
-            atomicAdd(&mlp.input_weights[i * hidden_size + j], learning_rate * d_hidden[j] * inputs[idx * input_size + i]);
+            float gradient = d_hidden_t[j] * input_sample[i];
+            atomicAdd(&mlp.input_weights[i * hidden_size + j], learning_rate * gradient);
         }
     }
+
     for (int i = 0; i < hidden_size; ++i) {
-        atomicAdd(&mlp.hidden_biases[i], learning_rate * d_hidden[i]);
+        float gradient = d_hidden_t[i];
+        atomicAdd(&mlp.hidden_biases[i], learning_rate * gradient);
     }
 }
 
-// Function to train the MLP
-void mlp_train(MLP *mlp, float *inputs, int *targets, int num_samples) {
+// Function to train the MLP using Mini-Batch Gradient Descent
+void mlp_train(MLP *mlp, float *inputs, int *targets, int num_samples, int batch_size) {
     // Copy inputs and targets to device memory
     float *d_inputs;
     int *d_targets;
@@ -163,17 +166,29 @@ void mlp_train(MLP *mlp, float *inputs, int *targets, int num_samples) {
     cudaMemcpy(d_targets, targets, target_size_bytes, cudaMemcpyHostToDevice);
 
     // Training parameters
-    int threads_per_block = 256;
-    int blocks_per_grid = (num_samples + threads_per_block - 1) / threads_per_block;
-
-    size_t shared_memory_size = (mlp->hidden_size + mlp->output_size * 4) * sizeof(float);  // Adjust as needed
+    int num_batches = (num_samples + batch_size - 1) / batch_size;
+    int threads_per_block = 256; // Adjust based on your GPU's capabilities
+    int max_threads_per_block = threads_per_block;
 
     for (int epoch = 0; epoch < NUM_EPOCHS; ++epoch) {
-        train_kernel<<<blocks_per_grid, threads_per_block, shared_memory_size>>>(*mlp,
-                                                                                 d_inputs, d_targets, num_samples,
-                                                                                 LEARNING_RATE,
-                                                                                 mlp->input_size, mlp->hidden_size, mlp->output_size);
-        cudaDeviceSynchronize();
+        for (int batch = 0; batch < num_batches; ++batch) {
+            int batch_start = batch * batch_size;
+            int current_batch_size = min(batch_size, num_samples - batch_start);
+
+            int blocks_per_grid = (current_batch_size + threads_per_block - 1) / threads_per_block;
+
+            // Launch kernel for the current batch
+            train_kernel<<<blocks_per_grid, threads_per_block>>>(
+                *mlp,
+                d_inputs + batch_start * mlp->input_size,
+                d_targets + batch_start,
+                current_batch_size,
+                LEARNING_RATE,
+                mlp->input_size, mlp->hidden_size, mlp->output_size
+            );
+
+            cudaDeviceSynchronize();
+        }
 
         if (epoch % 100 == 0) {
             printf("Epoch %d completed.\n", epoch);
@@ -188,94 +203,117 @@ void mlp_train(MLP *mlp, float *inputs, int *targets, int num_samples) {
 // Kernel for evaluation
 __global__ void evaluate_kernel(MLP mlp,
                                 float *inputs, int *targets, int num_samples,
-                                float *loss, int input_size, int hidden_size, int output_size) {
+                                float *loss, int *correct_count,
+                                int input_size, int hidden_size, int output_size) {
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
     if (idx >= num_samples)
         return;
 
-    // Forward pass
-    extern __shared__ float shared[];
-    float *hidden = shared;  // Shared memory for hidden layer activations
-    float *output = &shared[hidden_size];  // Output layer
+    // Thread-private variables
+    const int MAX_HIDDEN_SIZE = 1024;
+    const int MAX_OUTPUT_SIZE = 10;
 
-    // Compute hidden layer activations
+    float hidden_t[MAX_HIDDEN_SIZE];
+    float output_t[MAX_OUTPUT_SIZE];
+
+    // Load input and target
+    float *input_sample = &inputs[idx * input_size];
+    int target_label = targets[idx];
+
+    // Forward pass
     for (int i = 0; i < hidden_size; ++i) {
         float sum = mlp.hidden_biases[i];
         for (int j = 0; j < input_size; ++j) {
-            sum += inputs[idx * input_size + j] * mlp.input_weights[j * hidden_size + i];
+            sum += input_sample[j] * mlp.input_weights[j * hidden_size + i];
         }
         // Activation function (ReLU)
-        hidden[i] = fmaxf(0.0f, sum);
+        hidden_t[i] = fmaxf(0.0f, sum);
     }
 
-    // Compute output layer activations
+    // Output layer
     for (int i = 0; i < output_size; ++i) {
         float sum = mlp.output_biases[i];
         for (int j = 0; j < hidden_size; ++j) {
-            sum += hidden[j] * mlp.output_weights[j * output_size + i];
+            sum += hidden_t[j] * mlp.output_weights[j * output_size + i];
         }
         // Activation function (Sigmoid)
-        output[i] = 1.0f / (1.0f + expf(-sum));
+        output_t[i] = 1.0f / (1.0f + expf(-sum));
     }
 
-    // Compute error (Cross-entropy loss)
-    float target = (targets[idx] == 1) ? 1.0f : 0.0f;  // Adjust for multi-class
+    // Compute loss (Cross-Entropy) and accuracy
     float sample_loss = 0.0f;
+    float target_vector = (float)(target_label);
     for (int i = 0; i < output_size; ++i) {
-        float t = (targets[idx] == i) ? 1.0f : 0.0f;
-        sample_loss -= t * logf(output[i] + 1e-7f);  // Add epsilon to prevent log(0)
+        float t = (target_label == i) ? 1.0f : 0.0f;
+        sample_loss -= t * logf(output_t[i] + 1e-7f);  // Add epsilon to prevent log(0)
     }
 
     // Accumulate loss
     atomicAdd(loss, sample_loss);
+
+    // Determine if the prediction is correct
+    int predicted_label = 0;
+    float max_output = output_t[0];
+    for (int i = 1; i < output_size; ++i) {
+        if (output_t[i] > max_output) {
+            max_output = output_t[i];
+            predicted_label = i;
+        }
+    }
+    if (predicted_label == target_label) {
+        atomicAdd(correct_count, 1);
+    }
 }
 
 // Function to evaluate the MLP
-void mlp_evaluate(MLP *mlp, float *inputs, int *targets, int num_samples, float *loss) {
+void mlp_evaluate(MLP *mlp, float *inputs, int *targets, int num_samples, float *loss, float *accuracy) {
     // Copy inputs and targets to device memory
     float *d_inputs;
     int *d_targets;
     float *d_loss;
+    int *d_correct_count;
     size_t input_size_bytes = num_samples * mlp->input_size * sizeof(float);
     size_t target_size_bytes = num_samples * sizeof(int);
     cudaMalloc(&d_inputs, input_size_bytes);
     cudaMalloc(&d_targets, target_size_bytes);
     cudaMallocManaged(&d_loss, sizeof(float));
+    cudaMallocManaged(&d_correct_count, sizeof(int));
 
     cudaMemcpy(d_inputs, inputs, input_size_bytes, cudaMemcpyHostToDevice);
     cudaMemcpy(d_targets, targets, target_size_bytes, cudaMemcpyHostToDevice);
     *d_loss = 0.0f;
+    *d_correct_count = 0;
 
     // Evaluation parameters
     int threads_per_block = 256;
     int blocks_per_grid = (num_samples + threads_per_block - 1) / threads_per_block;
-    size_t shared_memory_size = (mlp->hidden_size + mlp->output_size) * sizeof(float);  // Adjust as needed
 
-    evaluate_kernel<<<blocks_per_grid, threads_per_block, shared_memory_size>>>(*mlp,
-                                                                                d_inputs, d_targets, num_samples,
-                                                                                d_loss,
-                                                                                mlp->input_size, mlp->hidden_size, mlp->output_size);
+    evaluate_kernel<<<blocks_per_grid, threads_per_block>>>(
+        *mlp,
+        d_inputs, d_targets, num_samples,
+        d_loss, d_correct_count,
+        mlp->input_size, mlp->hidden_size, mlp->output_size
+    );
     cudaDeviceSynchronize();
 
     *loss = *d_loss / num_samples;
+    *accuracy = (float)(*d_correct_count) / num_samples * 100.0f;
 
     // Free device memory
     cudaFree(d_inputs);
     cudaFree(d_targets);
     cudaFree(d_loss);
+    cudaFree(d_correct_count);
 }
 
 // ========================================================
-// Common Functions (Optional, if needed)
+// Common Functions (Optional)
 // ========================================================
-
-// You can remove or update the mlp_generate_data function as per your requirements.
-// It's no longer necessary if you're loading real datasets.
 
 // Function to generate data points (if needed)
 void mlp_generate_data(float *inputs, int *targets, int num_samples) {
-    seed_random();
+    srand((unsigned int)time(NULL));
     for (int i = 0; i < num_samples; ++i) {
         float x = ((float)rand() / RAND_MAX) * 2 - 1;  // Random value between -1 and 1
         float y = ((float)rand() / RAND_MAX) * 2 - 1;

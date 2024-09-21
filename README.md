@@ -70,18 +70,3 @@ I wish to improve my  "ML in C" abilities. Hence making a repo without any other
 
 **C Tests**: Use a testing framework like CUnit or Unity.
 **Python Tests**: Use unittest, pytest, or similar frameworks.
-
-## Potential Enhancements
-### Mini-Batch Gradient Decent
-Implement mini-batch gradient descent to reduce the overhead of updating weights and biases within critical sections.
-- Accumulate weight updates over a batch of samples.
-- Update weights and biases after processing the batch.
-
-### Atomic Operations
-Use atomic operations for weight updates if the hardware and compiler support them:
-```c
-#pragma omp atomic
-mlp->output_weights[i] += LEARNING_RATE * d_output * hidden[i];
-```
-### Thread-Private Variables
-Declare variables that should be private to each thread to prevent unintended sharing.
