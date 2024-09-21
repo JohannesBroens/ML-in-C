@@ -69,3 +69,9 @@ env/
 .bin/
 /.*/
 .vscode/
+
+# Ignore data
+*.data
+*.txt
+*.csv
+*.json
