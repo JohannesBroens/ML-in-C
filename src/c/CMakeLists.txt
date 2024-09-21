@@ -1,5 +1,9 @@
+# CMakeLists.txt
+
 cmake_minimum_required(VERSION 3.10)
 project(MLinC LANGUAGES C CUDA)
+
+set(CMAKE_C_STANDARD 99)
 
 # Conditional compilation for CUDA
 option(USE_CUDA "Build with CUDA support" ON)
@@ -8,7 +12,7 @@ option(USE_CUDA "Build with CUDA support" ON)
 add_subdirectory(models/mlp)
 
 # Add the executable
-add_executable(main main.c)
+add_executable(main main.c data_loader.c)
 
 # Link the mlp library and math library
 target_link_libraries(main PRIVATE mlp m)

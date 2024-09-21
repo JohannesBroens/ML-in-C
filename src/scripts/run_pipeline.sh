@@ -24,9 +24,22 @@ cmake .. -DUSE_CUDA=ON
 make
 
 # Step 4: Run the program
+# Step 4: Run the program
 echo "Running the program..."
-./main
 
-# Return to the project root directory
 cd "$PROJECT_ROOT"
+
+if [ $# -eq 1 ]; then
+    DATASET=$1
+    echo "Running on dataset: $DATASET"
+    ./src/c/build/main --dataset "$DATASET"
+else
+    DATASETS=("generated" "iris" "wine-red" "wine-white" "breast-cancer")
+    for DATASET in "${DATASETS[@]}"; do
+        echo "--------------------------------------------"
+        echo "Running on dataset: $DATASET"
+        ./src/c/build/main --dataset "$DATASET"
+    done
+fi
+
 echo "Pipeline completed."
