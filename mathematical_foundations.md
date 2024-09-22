@@ -105,18 +105,14 @@ Activation functions introduce non-linearity into the network, allowing it to le
 The loss function quantifies the difference between the predicted output and the true output.
 
 - **Mean Squared Error (MSE)** (for regression):
-
-  ```math
-  L(\mathbf{y}, \mathbf{\hat{y}}) = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
-  ```
-
+   ```math
+   L(\mathbf{y}, \mathbf{\hat{y}}) = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+   ```
 - **Cross-Entropy Loss** (for classification):
-  ```math
-  L(\mathbf{y}, \mathbf{\hat{y}}) = -\sum_{i=1}^{k} y_i \log(\hat{y}_i)
-  ```
-
+   ```math
+   L(\mathbf{y}, \mathbf{\hat{y}}) = -\sum_{i=1}^{k} y_i \log(\hat{y}_i)
+   ```
   Where:
-
   - $\mathbf{y}$: True labels (one-hot encoded).
   - $\mathbf{\hat{y}}$: Predicted probabilities.
 
@@ -136,34 +132,27 @@ Backpropagation is an algorithm used to compute the gradient of the loss functio
    - $\odot$: Element-wise multiplication.
 
 2. **Compute Hidden Layer Error**:
-
    ```math
    \delta^{(1)} = \left(\mathbf{W}^{(2)^\top} \delta^{(2)}\right) \odot f'\left(\mathbf{z}^{(1)}\right)
    ```
-
    - $\delta^{(1)} \in \mathbb{R}^{m}$: Error at the hidden layer.
    - $\mathbf{z}^{(1)} = \mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)}$
    - $f'$: Derivative of the activation function $f$.
 
 3. **Compute Gradients**:
-
-   ```math
-   \begin{align*}
-   \nabla_{\mathbf{W}^{(2)}} L &= \delta^{(2)} \mathbf{h}^\top \\
-   \nabla_{\mathbf{b}^{(2)}} L &= \delta^{(2)} \\
-   \nabla_{\mathbf{W}^{(1)}} L &= \delta^{(1)} \mathbf{x}^\top \\
-   \nabla_{\mathbf{b}^{(1)}} L &= \delta^{(1)}
-   \end{align*}
-   ```
-
+```math
+\begin{align*}
+\nabla_{\mathbf{W}^{(2)}} L &= \delta^{(2)} \mathbf{h}^\top \\
+\nabla_{\mathbf{b}^{(2)}} L &= \delta^{(2)} \\
+\nabla_{\mathbf{W}^{(1)}} L &= \delta^{(1)} \mathbf{x}^\top \\
+\nabla_{\mathbf{b}^{(1)}} L &= \delta^{(1)}
+\end{align*}
+```
 ### Gradient Descent Optimization
-
 Weights are updated using gradient descent:
-
 ```math
 \theta = \theta - \eta \nabla_{\theta} L
 ```
-
 - $\theta$: Model parameters (weights and biases).
 - $\eta$: Learning rate.
 - $\nabla_{\theta} L$: Gradient of the loss function with respect to $\theta$.
@@ -179,9 +168,8 @@ We will provide detailed mathematical derivations for the gradients with respect
 **Proof**:
 
 1. **Loss Function**:
-
+   
    For a single training example, the loss function using cross-entropy loss is:
-
    ```math
    L = -\sum_{i=1}^{k} y_i \log(\hat{y}_i)
    ```
@@ -189,11 +177,9 @@ We will provide detailed mathematical derivations for the gradients with respect
 2. **Predicted Output**:
 
    The predicted output is:
-
-   ```math
-   \hat{y}_i = g_i(\mathbf{z}^{(2)}) = \frac{e^{z_i^{(2)}}}{\sum_{j=1}^{k} e^{z_j^{(2)}}}
-   ```
-
+```math
+\hat{y}_i = g_i(\mathbf{z}^{(2)}) = \frac{e^{z_i^{(2)}}}{\sum_{j=1}^{k} e^{z_j^{(2)}}}
+```
 3. **Compute $\frac{\partial L}{\partial z_i^{(2)}}$**
 
    The derivative of the loss with respect to $z_i^{(2)}$ is:
