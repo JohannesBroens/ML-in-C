@@ -101,40 +101,34 @@ Activation functions introduce non-linearity into the network, allowing it to le
   ```
 
 ### Loss Function
-
 The loss function quantifies the difference between the predicted output and the true output.
-
 - **Mean Squared Error (MSE)** (for regression):
-   ```math
-   L(\mathbf{y}, \mathbf{\hat{y}}) = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
-   ```
+```math
+L(\mathbf{y}, \mathbf{\hat{y}}) = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
+```
 - **Cross-Entropy Loss** (for classification):
-   ```math
-   L(\mathbf{y}, \mathbf{\hat{y}}) = -\sum_{i=1}^{k} y_i \log(\hat{y}_i)
-   ```
+```math
+L(\mathbf{y}, \mathbf{\hat{y}}) = -\sum_{i=1}^{k} y_i \log(\hat{y}_i)
+```
   Where:
   - $\mathbf{y}$: True labels (one-hot encoded).
   - $\mathbf{\hat{y}}$: Predicted probabilities.
 
 ### Backpropagation Algorithm
-
 Backpropagation is an algorithm used to compute the gradient of the loss function with respect to the weights of the network. It applies the chain rule of calculus to compute these gradients efficiently.
-
 1. **Compute Output Error**:
-
-   ```math
-   \delta^{(2)} = \nabla_{\mathbf{\hat{y}}} L \odot g'\left(\mathbf{z}^{(2)}\right)
-   ```
-
+```math
+\delta^{(2)} = \nabla_{\mathbf{\hat{y}}} L \odot g'\left(\mathbf{z}^{(2)}\right)
+```
    - $\delta^{(2)} \in \mathbb{R}^{k}$: Error at the output layer.
    - $\mathbf{z}^{(2)} = \mathbf{W}^{(2)} \mathbf{h} + \mathbf{b}^{(2)}$
    - $g'$: Derivative of the activation function $g$.
    - $\odot$: Element-wise multiplication.
 
 2. **Compute Hidden Layer Error**:
-   ```math
-   \delta^{(1)} = \left(\mathbf{W}^{(2)^\top} \delta^{(2)}\right) \odot f'\left(\mathbf{z}^{(1)}\right)
-   ```
+```math
+\delta^{(1)} = \left(\mathbf{W}^{(2)^\top} \delta^{(2)}\right) \odot f'\left(\mathbf{z}^{(1)}\right)
+```
    - $\delta^{(1)} \in \mathbb{R}^{m}$: Error at the hidden layer.
    - $\mathbf{z}^{(1)} = \mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)}$
    - $f'$: Derivative of the activation function $f$.
@@ -168,47 +162,42 @@ We will provide detailed mathematical derivations for the gradients with respect
 **Proof**:
 
 1. **Loss Function**:
-   
    For a single training example, the loss function using cross-entropy loss is:
-   ```math
-   L = -\sum_{i=1}^{k} y_i \log(\hat{y}_i)
-   ```
-
+```math
+L = -\sum_{i=1}^{k} y_i \log(\hat{y}_i)
+```
 2. **Predicted Output**:
-
    The predicted output is:
 ```math
 \hat{y}_i = g_i(\mathbf{z}^{(2)}) = \frac{e^{z_i^{(2)}}}{\sum_{j=1}^{k} e^{z_j^{(2)}}}
 ```
 3. **Compute $\frac{\partial L}{\partial z_i^{(2)}}$**
-
    The derivative of the loss with respect to $z_i^{(2)}$ is:
-
-   ```math
-   \frac{\partial L}{\partial z_i^{(2)}} = \hat{y}_i - y_i
-   ```
+```math
+\frac{\partial L}{\partial z_i^{(2)}} = \hat{y}_i - y_i
+```
 
    **Proof**:
 
    - Using the chain rule:
 
-     ```math
-     \frac{\partial L}{\partial z_i^{(2)}} = \sum_{j=1}^{k} \frac{\partial L}{\partial \hat{y}_j} \frac{\partial \hat{y}_j}{\partial z_i^{(2)}}
-     ```
+```math
+\frac{\partial L}{\partial z_i^{(2)}} = \sum_{j=1}^{k} \frac{\partial L}{\partial \hat{y}_j} \frac{\partial \hat{y}_j}{\partial z_i^{(2)}}
+```
 
    - For cross-entropy loss and softmax activation, this simplifies to:
 
-     ```math
-     \frac{\partial L}{\partial z_i^{(2)}} = \hat{y}_i - y_i
-     ```
+```math
+\frac{\partial L}{\partial z_i^{(2)}} = \hat{y}_i - y_i
+```
 
 4. **Compute $\frac{\partial L}{\partial \mathbf{W}^{(2)}}$**
 
    The gradient with respect to the weights is:
 
-   ```math
-   \frac{\partial L}{\partial \mathbf{W}^{(2)}} = \delta^{(2)} \mathbf{h}^\top
-   ```
+```math
+\frac{\partial L}{\partial \mathbf{W}^{(2)}} = \delta^{(2)} \mathbf{h}^\top
+```
 
    Where $\delta^{(2)} = \hat{\mathbf{y}} - \mathbf{y}$.
 
@@ -222,25 +211,25 @@ We will provide detailed mathematical derivations for the gradients with respect
 
    From the chain rule:
 
-   ```math
-   \frac{\partial L}{\partial \mathbf{h}} = \left(\mathbf{W}^{(2)}\right)^\top \delta^{(2)}
-   ```
+```math
+\frac{\partial L}{\partial \mathbf{h}} = \left(\mathbf{W}^{(2)}\right)^\top \delta^{(2)}
+```
 
 2. **Compute $\delta^{(1)}$**
 
    Applying the element-wise multiplication with the derivative of the activation function:
 
-   ```math
-   \delta^{(1)} = \frac{\partial L}{\partial \mathbf{h}} \odot f'\left(\mathbf{z}^{(1)}\right)
-   ```
+```math
+\delta^{(1)} = \frac{\partial L}{\partial \mathbf{h}} \odot f'\left(\mathbf{z}^{(1)}\right)
+```
 
 3. **Compute $\frac{\partial L}{\partial \mathbf{W}^{(1)}}$**
 
    The gradient with respect to the weights is:
 
-   ```math
-   \frac{\partial L}{\partial \mathbf{W}^{(1)}} = \delta^{(1)} \mathbf{x}^\top
-   ```
+```math
+\frac{\partial L}{\partial \mathbf{W}^{(1)}} = \delta^{(1)} \mathbf{x}^\top
+```
 
 #### Summary
 
@@ -272,15 +261,15 @@ Pooling layers reduce the spatial dimensions of the data, helping to reduce over
 
 - **Max Pooling**:
 
-  ```math
-  S(i, j) = \max_{(m, n) \in \mathcal{P}(i, j)} I(m, n)
-  ```
+```math
+S(i, j) = \max_{(m, n) \in \mathcal{P}(i, j)} I(m, n)
+```
 
 - **Average Pooling**:
 
-  ```math
-  S(i, j) = \frac{1}{|\mathcal{P}(i, j)|} \sum_{(m, n) \in \mathcal{P}(i, j)} I(m, n)
-  ```
+```math
+S(i, j) = \frac{1}{|\mathcal{P}(i, j)|} \sum_{(m, n) \in \mathcal{P}(i, j)} I(m, n)
+```
 
 Where $\mathcal{P}(i, j)$ is the pooling region corresponding to output position $(i, j)$.
 
