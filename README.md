@@ -1,5 +1,5 @@
 # ML-in-C
-ML-in-C is a project aimed at enhancing machine learning capabilities using the C programming language. This repository contains implementations of machine learning models, such as Multi-Layer Perceptrons (MLPs) and Convolutional Neural Networks (CNNs), both in C and Python. The project focuses on performance optimization, leveraging CPU and GPU computations using CUDA, and providing benchmarking scripts for performance comparison.
+ML-in-C is a project aimed at enhancing machine learning capabilities using the C programming language. This repository contains implementations of machine learning models, such as Multi-Layer Perceptrons (MLPs) and Convolutional Neural Networks (CNNs), both in C and Python. The project focuses on performance optimization, leveraging CPU and GPU computations using OpenMP, CUDA, and providing benchmarking scripts for performance comparison.
 
 ## Table of Contents
 - [ML-in-C](#ml-in-c)
