@@ -38,12 +38,12 @@ An MLP typically consists of:
 
 Mathematically, an MLP with one hidden layer can be represented as:
 
-$$
+```math
 \begin{align*}
 \mathbf{h} &= f\left(\mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)}\right) \\
 \mathbf{\hat{y}} &= g\left(\mathbf{W}^{(2)} \mathbf{h} + \mathbf{b}^{(2)}\right)
 \end{align*}
-$$
+```
 
 Where:
 
@@ -63,45 +63,42 @@ Forward propagation involves computing the output of the network given an input.
 
 1. **Hidden Layer Computation**:
 
-   $$
+   ```math
    \mathbf{z}^{(1)} = \mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)}
-   $$
+   ```
 
-   $$
+   ```math
    \mathbf{h} = f\left(\mathbf{z}^{(1)}\right)
-   $$
+   ```
 
 2. **Output Layer Computation**:
 
-   $$
+   ```math
    \mathbf{z}^{(2)} = \mathbf{W}^{(2)} \mathbf{h} + \mathbf{b}^{(2)}
-   $$
+   ```
 
-   $$
+   ```math
    \mathbf{\hat{y}} = g\left(\mathbf{z}^{(2)}\right)
-   $$
+   ```
 
 ### Activation Functions
 
 Activation functions introduce non-linearity into the network, allowing it to learn complex patterns.
 
 - **ReLU (Rectified Linear Unit)**:
-
-  $$
+  ```math
   f(z) = \max(0, z)
-  $$
+  ```
 
 - **Sigmoid Function**:
-
-  $$
+  ```math
   g(z) = \frac{1}{1 + e^{-z}}
-  $$
+  ```
 
 - **Softmax Function** (for multi-class classification):
-
-  $$
+  ```math
   g_i(\mathbf{z}) = \frac{e^{z_i}}{\sum_{j} e^{z_j}}
-  $$
+  ```
 
 ### Loss Function
 
@@ -109,15 +106,14 @@ The loss function quantifies the difference between the predicted output and the
 
 - **Mean Squared Error (MSE)** (for regression):
 
-  $$
+  ```math
   L(\mathbf{y}, \mathbf{\hat{y}}) = \frac{1}{n} \sum_{i=1}^{n} (y_i - \hat{y}_i)^2
-  $$
+  ```
 
 - **Cross-Entropy Loss** (for classification):
-
-  $$
+  ```math
   L(\mathbf{y}, \mathbf{\hat{y}}) = -\sum_{i=1}^{k} y_i \log(\hat{y}_i)
-  $$
+  ```
 
   Where:
 
@@ -130,9 +126,9 @@ Backpropagation is an algorithm used to compute the gradient of the loss functio
 
 1. **Compute Output Error**:
 
-   $$
+   ```math
    \delta^{(2)} = \nabla_{\mathbf{\hat{y}}} L \odot g'\left(\mathbf{z}^{(2)}\right)
-   $$
+   ```
 
    - $\delta^{(2)} \in \mathbb{R}^{k}$: Error at the output layer.
    - $\mathbf{z}^{(2)} = \mathbf{W}^{(2)} \mathbf{h} + \mathbf{b}^{(2)}$
@@ -141,9 +137,9 @@ Backpropagation is an algorithm used to compute the gradient of the loss functio
 
 2. **Compute Hidden Layer Error**:
 
-   $$
+   ```math
    \delta^{(1)} = \left(\mathbf{W}^{(2)^\top} \delta^{(2)}\right) \odot f'\left(\mathbf{z}^{(1)}\right)
-   $$
+   ```
 
    - $\delta^{(1)} \in \mathbb{R}^{m}$: Error at the hidden layer.
    - $\mathbf{z}^{(1)} = \mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)}$
@@ -151,22 +147,22 @@ Backpropagation is an algorithm used to compute the gradient of the loss functio
 
 3. **Compute Gradients**:
 
-   $$
+   ```math
    \begin{align*}
    \nabla_{\mathbf{W}^{(2)}} L &= \delta^{(2)} \mathbf{h}^\top \\
    \nabla_{\mathbf{b}^{(2)}} L &= \delta^{(2)} \\
    \nabla_{\mathbf{W}^{(1)}} L &= \delta^{(1)} \mathbf{x}^\top \\
    \nabla_{\mathbf{b}^{(1)}} L &= \delta^{(1)}
    \end{align*}
-   $$
+   ```
 
 ### Gradient Descent Optimization
 
 Weights are updated using gradient descent:
 
-$$
+```math
 \theta = \theta - \eta \nabla_{\theta} L
-$$
+```
 
 - $\theta$: Model parameters (weights and biases).
 - $\eta$: Learning rate.
@@ -186,47 +182,47 @@ We will provide detailed mathematical derivations for the gradients with respect
 
    For a single training example, the loss function using cross-entropy loss is:
 
-   $$
+   ```math
    L = -\sum_{i=1}^{k} y_i \log(\hat{y}_i)
-   $$
+   ```
 
 2. **Predicted Output**:
 
    The predicted output is:
 
-   $$
+   ```math
    \hat{y}_i = g_i(\mathbf{z}^{(2)}) = \frac{e^{z_i^{(2)}}}{\sum_{j=1}^{k} e^{z_j^{(2)}}}
-   $$
+   ```
 
 3. **Compute $\frac{\partial L}{\partial z_i^{(2)}}$**
 
    The derivative of the loss with respect to $z_i^{(2)}$ is:
 
-   $$
+   ```math
    \frac{\partial L}{\partial z_i^{(2)}} = \hat{y}_i - y_i
-   $$
+   ```
 
    **Proof**:
 
    - Using the chain rule:
 
-     $$
+     ```math
      \frac{\partial L}{\partial z_i^{(2)}} = \sum_{j=1}^{k} \frac{\partial L}{\partial \hat{y}_j} \frac{\partial \hat{y}_j}{\partial z_i^{(2)}}
-     $$
+     ```
 
    - For cross-entropy loss and softmax activation, this simplifies to:
 
-     $$
+     ```math
      \frac{\partial L}{\partial z_i^{(2)}} = \hat{y}_i - y_i
-     $$
+     ```
 
 4. **Compute $\frac{\partial L}{\partial \mathbf{W}^{(2)}}$**
 
    The gradient with respect to the weights is:
 
-   $$
+   ```math
    \frac{\partial L}{\partial \mathbf{W}^{(2)}} = \delta^{(2)} \mathbf{h}^\top
-   $$
+   ```
 
    Where $\delta^{(2)} = \hat{\mathbf{y}} - \mathbf{y}$.
 
@@ -240,25 +236,25 @@ We will provide detailed mathematical derivations for the gradients with respect
 
    From the chain rule:
 
-   $$
+   ```math
    \frac{\partial L}{\partial \mathbf{h}} = \left(\mathbf{W}^{(2)}\right)^\top \delta^{(2)}
-   $$
+   ```
 
 2. **Compute $\delta^{(1)}$**
 
    Applying the element-wise multiplication with the derivative of the activation function:
 
-   $$
+   ```math
    \delta^{(1)} = \frac{\partial L}{\partial \mathbf{h}} \odot f'\left(\mathbf{z}^{(1)}\right)
-   $$
+   ```
 
 3. **Compute $\frac{\partial L}{\partial \mathbf{W}^{(1)}}$**
 
    The gradient with respect to the weights is:
 
-   $$
+   ```math
    \frac{\partial L}{\partial \mathbf{W}^{(1)}} = \delta^{(1)} \mathbf{x}^\top
-   $$
+   ```
 
 #### Summary
 
@@ -276,9 +272,9 @@ The convolution operation applies a kernel (filter) over the input data to extra
 
 Mathematically, for a 2D convolution:
 
-$$
+```math
 S(i,j) = (I * K)(i,j) = \sum_{m} \sum_{n} I(i - m, j - n) K(m, n)
-$$
+```
 
 - $I$: Input image.
 - $K$: Kernel (filter).
@@ -290,15 +286,15 @@ Pooling layers reduce the spatial dimensions of the data, helping to reduce over
 
 - **Max Pooling**:
 
-  $$
+  ```math
   S(i, j) = \max_{(m, n) \in \mathcal{P}(i, j)} I(m, n)
-  $$
+  ```
 
 - **Average Pooling**:
 
-  $$
+  ```math
   S(i, j) = \frac{1}{|\mathcal{P}(i, j)|} \sum_{(m, n) \in \mathcal{P}(i, j)} I(m, n)
-  $$
+  ```
 
 Where $\mathcal{P}(i, j)$ is the pooling region corresponding to output position $(i, j)$.
 
