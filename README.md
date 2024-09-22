@@ -124,7 +124,7 @@ cd src/scripts
 ```
 - **Note**: Ensure the script has execute permissions: 
 ```bash
-chmod +x rump
+chmod +x run_pipeline.sh
 ```
 ## Usage
 ### Running on Specific Datasets
