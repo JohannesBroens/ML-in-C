@@ -101,7 +101,7 @@ cd ML-in-C
 ```
 2. **Install Dependencies**: 
     - **For C code**:
-      - nsure that you have a C compiler and CUDA Toolkit installed. 
+      - Ensure that you have a C compiler and CUDA Toolkit installed. 
     - **For Python code**:
       - Install required Python packages: 
         ```bash
