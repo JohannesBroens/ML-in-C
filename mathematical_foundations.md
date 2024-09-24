@@ -38,8 +38,10 @@ This document provides an explanation of the mathematical principles underlying 
 This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP) model using mathematical notation. It captures the essence of forward propagation, loss computation, backpropagation, and parameter updates.
 
 ## MLP Training Algorithm
+
 ```math
-\begin{align*}
+
+\begin{align}
 &\textbf{Inputs:} \\
 &\quad \text{Training dataset: } \{ (\mathbf{x}^{(i)}, \mathbf{y}^{(i)}) \}_{i=1}^{N} \\
 &\quad \text{Number of epochs: } T \\
@@ -79,7 +81,9 @@ This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP)
 &\quad \text{END FOR} \\
 &\textbf{Output:} \\
 &\quad \text{Trained parameters } \mathbf{W}^{(1)}, \mathbf{b}^{(1)}, \mathbf{W}^{(2)}, \mathbf{b}^{(2)}
-\end{align*}
+
+\end{align}
+
 ```
 ## Detailed Steps
 
