@@ -42,44 +42,44 @@ This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP)
 ```math
 
 \begin{align}
-&\textbf{Inputs:} \\
-&\quad \text{Training dataset: } \{ (\mathbf{x}^{(i)}, \mathbf{y}^{(i)}) \}_{i=1}^{N} \\
-&\quad \text{Number of epochs: } T \\
-&\quad \text{Learning rate: } \eta \\
-&\quad \text{Network architecture:} \\
-&\quad \quad \text{Input size: } n \\
-&\quad \quad \text{Hidden layer size: } m \\
-&\quad \quad \text{Output size: } k \\
-&\textbf{Initialize Parameters:} \\
-&\quad \mathbf{W}^{(1)} \in \mathbb{R}^{m \times n} \sim \mathcal{N}(0, \sigma^2) \\
-&\quad \mathbf{b}^{(1)} \in \mathbb{R}^{m} \leftarrow \mathbf{0} \\
-&\quad \mathbf{W}^{(2)} \in \mathbb{R}^{k \times m} \sim \mathcal{N}(0, \sigma^2) \\
-&\quad \mathbf{b}^{(2)} \in \mathbb{R}^{k} \leftarrow \mathbf{0} \\
-&\textbf{Training Loop:} \\
-&\quad \text{FOR } \text{epoch} = 1 \text{ TO } T \text{ DO} \\
-&\quad \quad \text{FOR each training example } (\mathbf{x}, \mathbf{y}) \text{ DO} \\
-&\quad \quad \quad \textbf{Forward Propagation:} \\
-&\quad \quad \quad \quad \mathbf{z}^{(1)} = \mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)} \\
-&\quad \quad \quad \quad \mathbf{h} = f(\mathbf{z}^{(1)}) \\
-&\quad \quad \quad \quad \mathbf{z}^{(2)} = \mathbf{W}^{(2)} \mathbf{h} + \mathbf{b}^{(2)} \\
-&\quad \quad \quad \quad \hat{\mathbf{y}} = g(\mathbf{z}^{(2)}) \\
-&\quad \quad \quad \quad L = \text{Loss}(\mathbf{y}, \hat{\mathbf{y}}) \\
-&\quad \quad \quad \textbf{Backpropagation:} \\
-&\quad \quad \quad \quad \delta^{(2)} = \nabla_{\hat{\mathbf{y}}} L \odot g'(\mathbf{z}^{(2)}) \\
-&\quad \quad \quad \quad \delta^{(1)} = (\mathbf{W}^{(2)^\top} \delta^{(2)}) \odot f'(\mathbf{z}^{(1)}) \\
-&\quad \quad \quad \textbf{Gradient Computation:} \\
-&\quad \quad \quad \quad \nabla_{\mathbf{W}^{(2)}} L = \delta^{(2)} \mathbf{h}^\top \\
-&\quad \quad \quad \quad \nabla_{\mathbf{b}^{(2)}} L = \delta^{(2)} \\
-&\quad \quad \quad \quad \nabla_{\mathbf{W}^{(1)}} L = \delta^{(1)} \mathbf{x}^\top \\
-&\quad \quad \quad \quad \nabla_{\mathbf{b}^{(1)}} L = \delta^{(1)} \\
-&\quad \quad \quad \textbf{Parameter Update:} \\
-&\quad \quad \quad \quad \mathbf{W}^{(2)} \leftarrow \mathbf{W}^{(2)} - \eta \nabla_{\mathbf{W}^{(2)}} L \\
-&\quad \quad \quad \quad \mathbf{b}^{(2)} \leftarrow \mathbf{b}^{(2)} - \eta \nabla_{\mathbf{b}^{(2)}} L \\
-&\quad \quad \quad \quad \mathbf{W}^{(1)} \leftarrow \mathbf{W}^{(1)} - \eta \nabla_{\mathbf{W}^{(1)}} L \\
-&\quad \quad \quad \quad \mathbf{b}^{(1)} \leftarrow \mathbf{b}^{(1)} - \eta \nabla_{\mathbf{b}^{(1)}} L \\
-&\quad \quad \text{END FOR} \\
-&\quad \text{END FOR} \\
-&\textbf{Output:} \\
+&\textbf{Inputs:} \
+&\quad \text{Training dataset: } \{ (\mathbf{x}^{(i)}, \mathbf{y}^{(i)}) \}_{i=1}^{N} \
+&\quad \text{Number of epochs: } T \
+&\quad \text{Learning rate: } \eta \
+&\quad \text{Network architecture:} \
+&\quad \quad \text{Input size: } n \
+&\quad \quad \text{Hidden layer size: } m \
+&\quad \quad \text{Output size: } k \
+&\textbf{Initialize Parameters:} \
+&\quad \mathbf{W}^{(1)} \in \mathbb{R}^{m \times n} \sim \mathcal{N}(0, \sigma^2) \
+&\quad \mathbf{b}^{(1)} \in \mathbb{R}^{m} \leftarrow \mathbf{0} \
+&\quad \mathbf{W}^{(2)} \in \mathbb{R}^{k \times m} \sim \mathcal{N}(0, \sigma^2) \
+&\quad \mathbf{b}^{(2)} \in \mathbb{R}^{k} \leftarrow \mathbf{0} \
+&\textbf{Training Loop:} \
+&\quad \text{FOR } \text{epoch} = 1 \text{ TO } T \text{ DO} \
+&\quad \quad \text{FOR each training example } (\mathbf{x}, \mathbf{y}) \text{ DO} \
+&\quad \quad \quad \textbf{Forward Propagation:} \
+&\quad \quad \quad \quad \mathbf{z}^{(1)} = \mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)} \
+&\quad \quad \quad \quad \mathbf{h} = f(\mathbf{z}^{(1)}) \
+&\quad \quad \quad \quad \mathbf{z}^{(2)} = \mathbf{W}^{(2)} \mathbf{h} + \mathbf{b}^{(2)} \
+&\quad \quad \quad \quad \hat{\mathbf{y}} = g(\mathbf{z}^{(2)}) \
+&\quad \quad \quad \quad L = \text{Loss}(\mathbf{y}, \hat{\mathbf{y}}) \
+&\quad \quad \quad \textbf{Backpropagation:} \
+&\quad \quad \quad \quad \delta^{(2)} = \nabla_{\hat{\mathbf{y}}} L \odot g'(\mathbf{z}^{(2)}) \
+&\quad \quad \quad \quad \delta^{(1)} = (\mathbf{W}^{(2)^\top} \delta^{(2)}) \odot f'(\mathbf{z}^{(1)}) \
+&\quad \quad \quad \textbf{Gradient Computation:} \
+&\quad \quad \quad \quad \nabla_{\mathbf{W}^{(2)}} L = \delta^{(2)} \mathbf{h}^\top \
+&\quad \quad \quad \quad \nabla_{\mathbf{b}^{(2)}} L = \delta^{(2)} \
+&\quad \quad \quad \quad \nabla_{\mathbf{W}^{(1)}} L = \delta^{(1)} \mathbf{x}^\top \
+&\quad \quad \quad \quad \nabla_{\mathbf{b}^{(1)}} L = \delta^{(1)} \
+&\quad \quad \quad \textbf{Parameter Update:} \
+&\quad \quad \quad \quad \mathbf{W}^{(2)} \leftarrow \mathbf{W}^{(2)} - \eta \nabla_{\mathbf{W}^{(2)}} L \
+&\quad \quad \quad \quad \mathbf{b}^{(2)} \leftarrow \mathbf{b}^{(2)} - \eta \nabla_{\mathbf{b}^{(2)}} L \
+&\quad \quad \quad \quad \mathbf{W}^{(1)} \leftarrow \mathbf{W}^{(1)} - \eta \nabla_{\mathbf{W}^{(1)}} L \
+&\quad \quad \quad \quad \mathbf{b}^{(1)} \leftarrow \mathbf{b}^{(1)} - \eta \nabla_{\mathbf{b}^{(1)}} L \
+&\quad \quad \text{END FOR} \
+&\quad \text{END FOR} \
+&\textbf{Output:} \
 &\quad \text{Trained parameters } \mathbf{W}^{(1)}, \mathbf{b}^{(1)}, \mathbf{W}^{(2)}, \mathbf{b}^{(2)}
 
 \end{align}
