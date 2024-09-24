@@ -1,11 +1,20 @@
 # Mathematical Foundations
 
-This document provides a detailed explanation of the mathematical principles underlying the machine learning models implemented in this project, focusing primarily on the Multi-Layer Perceptron (MLP). It includes detailed mathematical derivations and proofs to offer a deeper understanding of the algorithms.
+This document provides an explanation of the mathematical principles underlying the machine learning models implemented in this project, focusing primarily on the Multi-Layer Perceptron (MLP). It includes detailed mathematical derivations and proofs to offer a deeper understanding of the algorithms.
 
 ## Table of Contents
 
 - [Mathematical Foundations](#mathematical-foundations)
   - [Table of Contents](#table-of-contents)
+- [Pseudo-Code for Multi-Layer Perceptron (MLP) Training](#pseudo-code-for-multi-layer-perceptron-mlp-training)
+  - [MLP Training Algorithm](#mlp-training-algorithm)
+  - [Detailed Steps](#detailed-steps)
+    - [1. Initialization](#1-initialization)
+    - [2. Forward Propagation](#2-forward-propagation)
+    - [3. Backpropagation](#3-backpropagation)
+    - [4. Gradient Computation](#4-gradient-computation)
+    - [5. Parameter Update](#5-parameter-update)
+  - [Mathematical Symbols and Notations](#mathematical-symbols-and-notations)
   - [Multi-Layer Perceptron (MLP)](#multi-layer-perceptron-mlp)
     - [Model Architecture](#model-architecture)
     - [Forward Propagation](#forward-propagation)
@@ -23,6 +32,128 @@ This document provides a detailed explanation of the mathematical principles und
   - [GPU Acceleration vs. CPU Parallelization](#gpu-acceleration-vs-cpu-parallelization)
 
 ---
+
+# Pseudo-Code for Multi-Layer Perceptron (MLP) Training
+
+This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP) model using mathematical notation. It captures the essence of forward propagation, loss computation, backpropagation, and parameter updates.
+
+## MLP Training Algorithm
+
+```math
+\begin{align*}
+&\textbf{Inputs:} \\
+&\quad \text{Training dataset: } \{ (\mathbf{x}^{(i)}, \mathbf{y}^{(i)}) \}_{i=1}^{N} \\
+&\quad \text{Number of epochs: } T \\
+&\quad \text{Learning rate: } \eta \\
+&\quad \text{Network architecture:} \\
+&\quad \quad \text{Input size: } n \\
+&\quad \quad \text{Hidden layer size: } m \\
+&\quad \quad \text{Output size: } k \\
+
+&\textbf{Initialize Parameters:} \\
+&\quad \mathbf{W}^{(1)} \in \mathbb{R}^{m \times n} \sim \mathcal{N}(0, \sigma^2) \\
+&\quad \mathbf{b}^{(1)} \in \mathbb{R}^{m} \leftarrow \mathbf{0} \\
+&\quad \mathbf{W}^{(2)} \in \mathbb{R}^{k \times m} \sim \mathcal{N}(0, \sigma^2) \\
+&\quad \mathbf{b}^{(2)} \in \mathbb{R}^{k} \leftarrow \mathbf{0} \\
+
+&\textbf{Training Loop:} \\
+&\quad \text{FOR } \text{epoch} = 1 \text{ TO } T \text{ DO} \\
+&\quad \quad \text{FOR each training example } (\mathbf{x}, \mathbf{y}) \text{ DO} \\
+&\quad \quad \quad \textbf{Forward Propagation:} \\
+&\quad \quad \quad \quad \mathbf{z}^{(1)} = \mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)} \\
+&\quad \quad \quad \quad \mathbf{h} = f(\mathbf{z}^{(1)}) \\
+&\quad \quad \quad \quad \mathbf{z}^{(2)} = \mathbf{W}^{(2)} \mathbf{h} + \mathbf{b}^{(2)} \\
+&\quad \quad \quad \quad \hat{\mathbf{y}} = g(\mathbf{z}^{(2)}) \\
+&\quad \quad \quad \quad L = \text{Loss}(\mathbf{y}, \hat{\mathbf{y}}) \\
+&\quad \quad \quad \textbf{Backpropagation:} \\
+&\quad \quad \quad \quad \delta^{(2)} = \nabla_{\hat{\mathbf{y}}} L \odot g'(\mathbf{z}^{(2)}) \\
+&\quad \quad \quad \quad \delta^{(1)} = (\mathbf{W}^{(2)^\top} \delta^{(2)}) \odot f'(\mathbf{z}^{(1)}) \\
+&\quad \quad \quad \textbf{Gradient Computation:} \\
+&\quad \quad \quad \quad \nabla_{\mathbf{W}^{(2)}} L = \delta^{(2)} \mathbf{h}^\top \\
+&\quad \quad \quad \quad \nabla_{\mathbf{b}^{(2)}} L = \delta^{(2)} \\
+&\quad \quad \quad \quad \nabla_{\mathbf{W}^{(1)}} L = \delta^{(1)} \mathbf{x}^\top \\
+&\quad \quad \quad \quad \nabla_{\mathbf{b}^{(1)}} L = \delta^{(1)} \\
+&\quad \quad \quad \textbf{Parameter Update:} \\
+&\quad \quad \quad \quad \mathbf{W}^{(2)} \leftarrow \mathbf{W}^{(2)} - \eta \nabla_{\mathbf{W}^{(2)}} L \\
+&\quad \quad \quad \quad \mathbf{b}^{(2)} \leftarrow \mathbf{b}^{(2)} - \eta \nabla_{\mathbf{b}^{(2)}} L \\
+&\quad \quad \quad \quad \mathbf{W}^{(1)} \leftarrow \mathbf{W}^{(1)} - \eta \nabla_{\mathbf{W}^{(1)}} L \\
+&\quad \quad \quad \quad \mathbf{b}^{(1)} \leftarrow \mathbf{b}^{(1)} - \eta \nabla_{\mathbf{b}^{(1)}} L \\
+&\quad \quad \text{END FOR} \\
+&\quad \text{END FOR} \\
+&\textbf{Output:} \\
+&\quad \text{Trained parameters } \mathbf{W}^{(1)}, \mathbf{b}^{(1)}, \mathbf{W}^{(2)}, \mathbf{b}^{(2)}
+\end{align*}
+```
+
+## Detailed Steps
+
+### 1. Initialization
+
+```math
+\begin{align*}
+\mathbf{W}^{(1)} &\sim \mathcal{N}(0, \sigma^2) \quad \text{(Initialize input-to-hidden weights)} \\
+\mathbf{b}^{(1)} &= \mathbf{0} \quad \text{(Initialize hidden layer biases)} \\
+\mathbf{W}^{(2)} &\sim \mathcal{N}(0, \sigma^2) \quad \text{(Initialize hidden-to-output weights)} \\
+\mathbf{b}^{(2)} &= \mathbf{0} \quad \text{(Initialize output layer biases)}
+\end{align*}
+```
+
+### 2. Forward Propagation
+
+```math
+\begin{align*}
+\mathbf{z}^{(1)} &= \mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)} \\
+\mathbf{h} &= f(\mathbf{z}^{(1)}) \\
+\mathbf{z}^{(2)} &= \mathbf{W}^{(2)} \mathbf{h} + \mathbf{b}^{(2)} \\
+\hat{\mathbf{y}} &= g(\mathbf{z}^{(2)}) \\
+L &= \text{Loss}(\mathbf{y}, \hat{\mathbf{y}})
+\end{align*}
+```
+
+### 3. Backpropagation
+
+```math
+\begin{align*}
+\delta^{(2)} &= \nabla_{\hat{\mathbf{y}}} L \odot g'(\mathbf{z}^{(2)}) \\
+\delta^{(1)} &= (\mathbf{W}^{(2)^\top} \delta^{(2)}) \odot f'(\mathbf{z}^{(1)})
+\end{align*}
+```
+
+### 4. Gradient Computation
+
+```math
+\begin{align*}
+\nabla_{\mathbf{W}^{(2)}} L &= \delta^{(2)} \mathbf{h}^\top \\
+\nabla_{\mathbf{b}^{(2)}} L &= \delta^{(2)} \\
+\nabla_{\mathbf{W}^{(1)}} L &= \delta^{(1)} \mathbf{x}^\top \\
+\nabla_{\mathbf{b}^{(1)}} L &= \delta^{(1)}
+\end{align*}
+```
+
+### 5. Parameter Update
+
+```math
+\begin{align*}
+\mathbf{W}^{(2)} &\leftarrow \mathbf{W}^{(2)} - \eta \nabla_{\mathbf{W}^{(2)}} L \\
+\mathbf{b}^{(2)} &\leftarrow \mathbf{b}^{(2)} - \eta \nabla_{\mathbf{b}^{(2)}} L \\
+\mathbf{W}^{(1)} &\leftarrow \mathbf{W}^{(1)} - \eta \nabla_{\mathbf{W}^{(1)}} L \\
+\mathbf{b}^{(1)} &\leftarrow \mathbf{b}^{(1)} - \eta \nabla_{\mathbf{b}^{(1)}} L
+\end{align*}
+```
+
+## Mathematical Symbols and Notations
+
+- $\mathbf{x} \in \mathbb{R}^{n}$: Input vector.
+- $\mathbf{y} \in \mathbb{R}^{k}$: True label (one-hot encoded).
+- $\hat{\mathbf{y}} \in \mathbb{R}^{k}$: Predicted output vector.
+- $f$, $g$: Activation functions (e.g., ReLU, Softmax).
+- $L$: Loss function (e.g., Cross-Entropy Loss).
+- $\eta$: Learning rate.
+- $\odot$: Element-wise multiplication.
+- $\mathcal{N}(0, \sigma^2)$: Normal distribution with mean $0$ and variance $\sigma^2$.
+
+---
+
 
 ## Multi-Layer Perceptron (MLP)
 
