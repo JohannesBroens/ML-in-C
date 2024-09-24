@@ -38,7 +38,6 @@ This document provides an explanation of the mathematical principles underlying 
 This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP) model using mathematical notation. It captures the essence of forward propagation, loss computation, backpropagation, and parameter updates.
 
 ## MLP Training Algorithm
-
 ```math
 \begin{align*}
 &\textbf{Inputs:} \\
@@ -49,13 +48,11 @@ This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP)
 &\quad \quad \text{Input size: } n \\
 &\quad \quad \text{Hidden layer size: } m \\
 &\quad \quad \text{Output size: } k \\
-
 &\textbf{Initialize Parameters:} \\
 &\quad \mathbf{W}^{(1)} \in \mathbb{R}^{m \times n} \sim \mathcal{N}(0, \sigma^2) \\
 &\quad \mathbf{b}^{(1)} \in \mathbb{R}^{m} \leftarrow \mathbf{0} \\
 &\quad \mathbf{W}^{(2)} \in \mathbb{R}^{k \times m} \sim \mathcal{N}(0, \sigma^2) \\
 &\quad \mathbf{b}^{(2)} \in \mathbb{R}^{k} \leftarrow \mathbf{0} \\
-
 &\textbf{Training Loop:} \\
 &\quad \text{FOR } \text{epoch} = 1 \text{ TO } T \text{ DO} \\
 &\quad \quad \text{FOR each training example } (\mathbf{x}, \mathbf{y}) \text{ DO} \\
@@ -84,11 +81,9 @@ This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP)
 &\quad \text{Trained parameters } \mathbf{W}^{(1)}, \mathbf{b}^{(1)}, \mathbf{W}^{(2)}, \mathbf{b}^{(2)}
 \end{align*}
 ```
-
 ## Detailed Steps
 
 ### 1. Initialization
-
 ```math
 \begin{align*}
 \mathbf{W}^{(1)} &\sim \mathcal{N}(0, \sigma^2) \quad \text{(Initialize input-to-hidden weights)} \\
@@ -99,7 +94,6 @@ This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP)
 ```
 
 ### 2. Forward Propagation
-
 ```math
 \begin{align*}
 \mathbf{z}^{(1)} &= \mathbf{W}^{(1)} \mathbf{x} + \mathbf{b}^{(1)} \\
@@ -111,7 +105,6 @@ L &= \text{Loss}(\mathbf{y}, \hat{\mathbf{y}})
 ```
 
 ### 3. Backpropagation
-
 ```math
 \begin{align*}
 \delta^{(2)} &= \nabla_{\hat{\mathbf{y}}} L \odot g'(\mathbf{z}^{(2)}) \\
@@ -120,7 +113,6 @@ L &= \text{Loss}(\mathbf{y}, \hat{\mathbf{y}})
 ```
 
 ### 4. Gradient Computation
-
 ```math
 \begin{align*}
 \nabla_{\mathbf{W}^{(2)}} L &= \delta^{(2)} \mathbf{h}^\top \\
@@ -131,7 +123,6 @@ L &= \text{Loss}(\mathbf{y}, \hat{\mathbf{y}})
 ```
 
 ### 5. Parameter Update
-
 ```math
 \begin{align*}
 \mathbf{W}^{(2)} &\leftarrow \mathbf{W}^{(2)} - \eta \nabla_{\mathbf{W}^{(2)}} L \\
@@ -142,7 +133,6 @@ L &= \text{Loss}(\mathbf{y}, \hat{\mathbf{y}})
 ```
 
 ## Mathematical Symbols and Notations
-
 - $\mathbf{x} \in \mathbb{R}^{n}$: Input vector.
 - $\mathbf{y} \in \mathbb{R}^{k}$: True label (one-hot encoded).
 - $\hat{\mathbf{y}} \in \mathbb{R}^{k}$: Predicted output vector.
