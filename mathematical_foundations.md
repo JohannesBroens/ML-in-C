@@ -39,7 +39,7 @@ This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP)
 
 ## MLP Training Algorithm
 
-```math
+$$
 \begin{align*}
 &\textbf{Inputs:} \
 &\quad \text{Training dataset: } \{ (\mathbf{x}^{(i)}, \mathbf{y}^{(i)}) \}_{i=1}^{N} \
@@ -81,7 +81,7 @@ This pseudo-code outlines the training process of a Multi-Layer Perceptron (MLP)
 &\textbf{Output:} \
 &\quad \text{Trained parameters } \mathbf{W}^{(1)}, \mathbf{b}^{(1)}, \mathbf{W}^{(2)}, \mathbf{b}^{(2)}
 \end{align*}
-```
+$$
 ## Detailed Steps
 
 ### 1. Initialization
